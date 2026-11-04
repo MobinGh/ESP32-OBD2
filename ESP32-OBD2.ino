@@ -28,7 +28,7 @@ enum Phase {
 
 Phase phase = OFFLINE;
 
-bool btStarted = false;
+bool bluetoothInitialized = false;
 bool waiting = false;
 bool hadConnection = false;
 
@@ -117,7 +117,6 @@ bool speedFromResponse(String raw, int &speed) {
   raw.replace("\n", "");
   raw.replace("\t", "");
 
-  // Find a positive response to PID 010D
   int pos = raw.indexOf("410D");
 
   if (pos < 0 || pos + 6 > (int)raw.length()) {
@@ -245,19 +244,17 @@ void setup() {
     "\nESP32 OBD2 Diagnostic v2.0"
   );
 
-  Serial.println(
-    "[01 BT INIT][START]"
-  );
+  Serial.println("[01 BT INIT][START]");
 
-  btStarted = obd.begin(
+  bluetoothInitialized = obd.begin(
     "ESP32-OBD2",
     true
   );
 
   event(
     "01 BT INIT",
-    btStarted ? "PASS" : "FAIL",
-    btStarted ?
+    bluetoothInitialized ? "PASS" : "FAIL",
+    bluetoothInitialized ?
       "Bluetooth Classic master ready" :
       "Bluetooth startup failed"
   );
@@ -266,7 +263,7 @@ void setup() {
 }
 
 void loop() {
-  if (!btStarted) {
+  if (!bluetoothInitialized) {
     delay(1000);
     return;
   }
